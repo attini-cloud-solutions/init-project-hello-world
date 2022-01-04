@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: # These macros is needed for the Attini::Deploy::DeploymentPlan to work. You can add additional macros if you need it.
+  - AttiniDeploymentPlan
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AttiniEnvironmentName: # This is automatically configured by the Attini Framework, find more info here https://acc.docs.attini.io/api-reference/cloudformation-configuration.html#framework-parameters
+    Type: String
+
+  ConfigEnvironment:
+    Type: String
+
+  ParameterValue:
+    Type: String
+
+Resources:
+
+  HelloWorldDeploymentPlan:
+    Type: Attini::Deploy::DeploymentPlan # https://acc.docs.attini.io/api-reference/deployment-plan.html
+    Properties:
+      DeploymentPlan:
+        StartAt: HelloWorldParameter
+        States:
+          HelloWorldParameter:
+            Type: AttiniCfn # https://acc.docs.attini.io/api-reference/deployment-plan-types.html
+            Properties:
+              StackName: !Sub ${AttiniEnvironmentName}-hello-world-parameter
+              Template: /ssm-parameter.yaml
+              ExecutionRole: !GetAtt DeploymentPlanExecutionRole.Arn
+              Parameters:
+                ParameterValue: !Ref ParameterValue
+            Next: HelloWorldLambda
+          HelloWorldLambda:
+            Type: AttiniCfn
+            Properties:
+              StackName: !Sub ${AttiniEnvironmentName}-hello-world-lambda
+              Template: /lambda.yaml
+              ExecutionRole: !GetAtt DeploymentPlanExecutionRole.Arn
+              Parameters:
+                SsmParameterKey.$: $.output.HelloWorldParameter.SsmParameterKey
+              ConfigFile: !Sub /config/${ConfigEnvironment}-lambda-config.yaml
+            End: True
+
+
+  DeploymentPlanExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Attini execution role used to create CloudFormation Stacks
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              AWS:
+                !Sub arn:aws:iam::${AWS::AccountId}:role/attini/attini-action-role-${AWS::Region}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      Policies:
+        - PolicyName: inline-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                - iam:CreateRole
+                - iam:UpdateRole
+                - iam:DeleteRole
+                - iam:TagRole
+                - iam:UntagRole
+                Resource: "*"

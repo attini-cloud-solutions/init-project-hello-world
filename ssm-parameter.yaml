@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  AttiniEnvironmentName:
+    Type: String
+
+  ParameterValue:
+    Type: String
+
+Resources:
+
+  HelloWorldParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: This is a hello world parameter
+      Name: !Sub /${AttiniEnvironmentName}/hello-world
+      Type: String
+      Value: !Ref ParameterValue
+
+Outputs:
+
+  SsmParameterKey:
+    Value: !Ref HelloWorldParameter

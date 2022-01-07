@@ -4,7 +4,7 @@ Transform: # These macros is needed for the Attini::Deploy::DeploymentPlan to wo
   - AWS::Serverless-2016-10-31
 
 Parameters:
-  AttiniEnvironmentName: # This is automatically configured by the Attini Framework, find more info here https://acc.docs.attini.io/api-reference/cloudformation-configuration.html#framework-parameters
+  AttiniEnvironmentName: # This is automatically configured by the Attini Framework, find more info here https://docs.attini.io/api-reference/cloudformation-configuration.html#framework-parameters
     Type: String
 
   ConfigEnvironment:
@@ -16,17 +16,17 @@ Parameters:
 Resources:
 
   HelloWorldDeploymentPlan:
-    Type: Attini::Deploy::DeploymentPlan # https://acc.docs.attini.io/api-reference/deployment-plan.html
+    Type: Attini::Deploy::DeploymentPlan # https://docs.attini.io/api-reference/deployment-plan.html
     Properties:
       DeploymentPlan:
         StartAt: HelloWorldParameter
         States:
           HelloWorldParameter:
-            Type: AttiniCfn # https://acc.docs.attini.io/api-reference/deployment-plan-types.html
+            Type: AttiniCfn # https://docs.attini.io/api-reference/deployment-plan-types.html
             Properties:
               StackName: !Sub ${AttiniEnvironmentName}-hello-world-parameter
               Template: /ssm-parameter.yaml
-              ExecutionRole: !GetAtt DeploymentPlanExecutionRole.Arn
+              ExecutionRoleArn: !GetAtt DeploymentPlanExecutionRole.Arn
               Parameters:
                 ParameterValue: !Ref ParameterValue
             Next: HelloWorldLambda
@@ -35,7 +35,7 @@ Resources:
             Properties:
               StackName: !Sub ${AttiniEnvironmentName}-hello-world-lambda
               Template: /lambda.yaml
-              ExecutionRole: !GetAtt DeploymentPlanExecutionRole.Arn
+              ExecutionRoleArn: !GetAtt DeploymentPlanExecutionRole.Arn
               Parameters:
                 SsmParameterKey.$: $.output.HelloWorldParameter.SsmParameterKey
               ConfigFile: !Sub /config/${ConfigEnvironment}-lambda-config.yaml

@@ -7,10 +7,10 @@ Parameters:
   AttiniEnvironmentName: # This is automatically configured by the Attini Framework, find more info here https://docs.attini.io/api-reference/cloudformation-configuration.html#framework-parameters
     Type: String
 
-  ConfigEnvironment:
+  ConfigEnvironment: # This parameter is read from the attini-config file
     Type: String
 
-  ParameterValue:
+  ParameterValue: # This parameter is read from the attini-config file
     Type: String
 
 Resources:
@@ -24,7 +24,7 @@ Resources:
           HelloWorldParameter:
             Type: AttiniCfn # https://docs.attini.io/api-reference/deployment-plan-types.html
             Properties:
-              StackName: !Sub ${AttiniEnvironmentName}-hello-world-parameter
+              StackName: !Sub ${AttiniEnvironmentName}-hello-world-parameter #prefixing the stack with the environment is useful if you have more than one environment in your account. Otherwise, it is not required.
               Template: /ssm-parameter.yaml
               ExecutionRoleArn: !GetAtt DeploymentPlanExecutionRole.Arn
               Parameters:
@@ -37,7 +37,7 @@ Resources:
               Template: /lambda.yaml
               ExecutionRoleArn: !GetAtt DeploymentPlanExecutionRole.Arn
               Parameters:
-                SsmParameterKey.$: $.output.HelloWorldParameter.SsmParameterKey
+                SsmParameterKey.$: $.output.HelloWorldParameter.SsmParameterKey #outputs from stacks in previous AttiniCfn steps can be read from the payload under output.<stepName>.<outputName> using standard StepFunction syntax
               ConfigFile: !Sub /config/${ConfigEnvironment}-lambda-config.yaml
             End: True
 

@@ -19,5 +19,5 @@ Resources:
 
 Outputs:
 
-  SsmParameterKey:
+  SsmParameterKey: # Output the parameter key so that it can be read by subsequent steps in the deployment plan.
     Value: !Ref HelloWorldParameter

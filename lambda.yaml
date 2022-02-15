@@ -32,7 +32,7 @@ Resources:
 
           def lambda_handler(event, context):
 
-            return ssm_client.get_parameter(
+            return "Hello " + ssm_client.get_parameter(
                 Name=os.environ["SsmParameterKey"]
             )["Parameter"]["Value"]
 

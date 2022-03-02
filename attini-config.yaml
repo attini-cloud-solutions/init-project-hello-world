@@ -5,17 +5,17 @@ initDeployConfig:
   parameters: # Parameters for the init deployment stack, the first key represent the environment
     default: # The "default" key will be used if the environment that you are deploying to do not have the specific config
       ConfigEnvironment: dev # This is used as a pattern to re-use config for many environments, now we can deploy to ex "dev1" and "dev2" and they will use the same configuration
-      ParameterValue: cruel-world
+      ParameterValue: cruel world
     stage:
       ConfigEnvironment: prod # We want the staging environment to use the same configuration file as out production environment
-      ParameterValue: staging-world
+      ParameterValue: staging world
     prod:
       ConfigEnvironment: prod
-      ParameterValue: real-world
+      ParameterValue: real world
 
 package: # When you use the Attini CLI to "package" a distribution, these instructions will be used, find more info here https://docs.attini.io/api-reference/attini-configuration.html
   prePackage:
-    commands: # These shell commands will be executed on a temporary copy of your files so they will not effect your source files
+    commands: # These shell commands will be executed in a temporary copy of your files, so they will not affect your source files
       - echo "Setting the distribution id to random"
       - attini configure set-dist-id --id `date '+%Y-%m-%d_%H:%M:%S'`
         # Using the Attini CLI to set the distribution id to the current time.

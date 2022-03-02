@@ -32,9 +32,14 @@ Resources:
 
           def lambda_handler(event, context):
 
-            return ssm_client.get_parameter(
+            parameter = ssm_client.get_parameter(
                 Name=os.environ["SsmParameterKey"]
             )["Parameter"]["Value"]
+
+            return {
+                "statusCode": 200,
+                "body": f"Hello {parameter}\n"
+            }
 
       Environment:
         Variables:
@@ -43,6 +48,12 @@ Resources:
       MemorySize: !Ref MemorySize
       Runtime: !Ref Runtime
       Timeout: !Ref Timeout
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: GET
       Policies:
         Statement:
           - Effect: Allow
@@ -56,3 +67,9 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${HelloWorldLambda}
       RetentionInDays: 30
+
+
+Outputs:
+  Endpoint:
+    Description: API Gateway URL
+    Value: !GetAtt ServerlessHttpApi.ApiEndpoint

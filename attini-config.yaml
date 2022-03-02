@@ -17,6 +17,6 @@ package: # When you use the Attini CLI to "package" a distribution, these instru
   prePackage:
     commands: # These shell commands will be executed on a temporary copy of your files so they will not effect your source files
       - echo "Setting the distribution id to random"
-      - attini configure set-dist-id --random
-        # Using the Attini CLI to set the distribution id, if you use the "--id" flag instead of random you can set this to any value you want
-        # We recommend you to use something that can be linked to your source control, example a git commit
+      - attini configure set-dist-id --id `date '+%Y-%m-%d_%H:%M:%S'`
+        # Using the Attini CLI to set the distribution id to the current time.
+        # We recommend you to use a meaningful and unique value, for example, a git commit id.

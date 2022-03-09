@@ -16,7 +16,7 @@ initDeployConfig:
 package: # When you use the Attini CLI to "package" a distribution, these instructions will be used, find more info here https://docs.attini.io/api-reference/attini-configuration.html
   prePackage:
     commands: # These shell commands will be executed in a temporary copy of your files, so they will not affect your source files
-      - echo "Setting the distribution id to random"
+      - echo "Setting the distribution id to the current date time"
       - attini configure set-dist-id --id `date '+%Y-%m-%d_%H:%M:%S'`
         # Using the Attini CLI to set the distribution id to the current time.
         # We recommend you to use a meaningful and unique value, for example, a git commit id.

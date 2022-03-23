@@ -62,7 +62,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
         - arn:aws:iam::aws:policy/AWSLambda_FullAccess
         - arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator
-        - !Sub arn:aws:iam::${AWS::AccountId}:policy/attini-cfn-policy-${AWS::Region} # This policy by the Attini Framework on all CloudFormation stacks roles.
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/attini-cfn-policy-${AWS::Region} # This policy id created by attini-setup and is required on all CloudFormation stacks roles.
       Policies:
         - PolicyName: inline-policy
           PolicyDocument:

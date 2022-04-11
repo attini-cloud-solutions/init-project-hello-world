@@ -4,13 +4,13 @@ initDeployConfig:
   stackName: ${environment}-${distributionName}-deployment-plan # The stack name for the init deployment, this stack will for example be called "dev-hello-world-deployment-plan"
   parameters: # Parameters for the init deployment stack, the first key represent the environment
     default: # The "default" key will be used if the environment that you are deploying to do not have the specific config
-      ConfigEnvironment: dev # This is used as a pattern to re-use config for many environments, now we can deploy to ex "dev1" and "dev2" and they will use the same configuration
+      ConfigurationSet: dev # This is a an example of a very useful configuration pattern, see https://docs.attini.io/knowledge-bank/multi-environment-configuration-pattern.html
       ParameterValue: cruel world
     stage:
-      ConfigEnvironment: production # We want the staging environment to use the same configuration file as out production environment
+      ConfigurationSet: production # We want the staging environment to use the same configuration file as out production environment
       ParameterValue: staging world
     production:
-      ConfigEnvironment: production
+      ConfigurationSet: production
       ParameterValue: real world
 
 package: # When you use the Attini CLI to "package" a distribution, these instructions will be used, find more info here https://docs.attini.io/api-reference/attini-configuration.html

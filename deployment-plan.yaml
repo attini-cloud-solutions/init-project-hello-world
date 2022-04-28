@@ -10,7 +10,7 @@ Parameters:
   AttiniDistributionName: # This is automatically configured by the Attini Framework, find more info here https://docs.attini.io/api-reference/cloudformation-configuration.html#framework-parameters
     Type: String
 
-  ConfigurationGroup: # This parameter is read from the attini-config file
+  ConfigEnv: # This parameter is read from the attini-config file
     Type: String
 
   ParameterValue: # This parameter is read from the attini-config file
@@ -41,7 +41,7 @@ Resources:
               ExecutionRoleArn: !GetAtt DeploymentPlanExecutionRole.Arn
               Parameters:
                 SsmParameterKey.$: $.output.HelloWorldParameter.SsmParameterKey #outputs from stacks in previous AttiniCfn steps can be read from the payload under output.<stepName>.<outputName> using standard StepFunction syntax
-              ConfigFile: !Sub /config/${ConfigurationGroup}-lambda-config.yaml
+              ConfigFile: !Sub /config/${ConfigEnv}-lambda-config.yaml
             End: True
 
 

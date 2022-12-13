@@ -7,93 +7,20 @@ Parameters:
   AttiniEnvironmentName: # This is automatically configured by the Attini Framework, find more info here https://docs.attini.io/api-reference/cloudformation-configuration.html#framework-parameters
     Type: String
 
-  AttiniDistributionName: # This is automatically configured by the Attini Framework, find more info here https://docs.attini.io/api-reference/cloudformation-configuration.html#framework-parameters
-    Type: String
-
-  ConfigEnv: # This parameter is read from the attini-config file
-    Type: String
-
-  ParameterValue: # This parameter is read from the attini-config file
-    Type: String
-
 Resources:
 
   HelloWorldDeploymentPlan:
     Type: Attini::Deploy::DeploymentPlan # https://docs.attini.io/api-reference/deployment-plan.html
     Properties:
       DeploymentPlan:
-        StartAt: HelloWorldParameter
-        States:
-          HelloWorldParameter:
-            Type: AttiniCfn # https://docs.attini.io/api-reference/deployment-plan-types.html
-            Properties:
-              StackName: !Sub ${AttiniEnvironmentName}-hello-world-parameter #prefixing the stack with the environment is useful if you have more than one environment in your account. Otherwise, it is not required.
-              Template: /ssm-parameter.yaml
-              ExecutionRoleArn: !GetAtt DeploymentPlanExecutionRole.Arn
-              Parameters:
-                ParameterValue: !Ref ParameterValue
-            Next: HelloWorldLambda
-          HelloWorldLambda:
-            Type: AttiniCfn
-            Properties:
-              StackName: !Sub ${AttiniEnvironmentName}-hello-world-lambda
-              Template: /lambda.yaml
-              ExecutionRoleArn: !GetAtt DeploymentPlanExecutionRole.Arn
-              Parameters:
-                SsmParameterKey.$: $.output.HelloWorldParameter.SsmParameterKey #outputs from stacks in previous AttiniCfn steps can be read from the payload under output.<stepName>.<outputName> using standard StepFunction syntax
-              ConfigFile: !Sub /config/${ConfigEnv}-lambda-config.yaml
-            End: True
+        - Name: HelloWorldLambda
+          Type: AttiniCfn
+          Properties:
+            StackName: !Sub ${AttiniEnvironmentName}-hello-world-lambda
+            Template: /endpoint-lambda/lambda.yaml
+        - Name: InvokeTheLambda
+          Type: AttiniLambdaInvoke
+          Parameters:
+            FunctionName.$: $.output.HelloWorldLambda.FunctionName
 
 
-  DeploymentPlanExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Description: Attini execution role used to create CloudFormation Stacks
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          -
-            Effect: Allow
-            Principal:
-              AWS:
-                !Sub arn:aws:iam::${AWS::AccountId}:role/attini/attini-action-role-${AWS::Region}
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
-        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
-        - arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator
-        - !Sub arn:aws:iam::${AWS::AccountId}:policy/attini-cfn-policy-${AWS::Region} # This policy id created by attini-setup and is required on all CloudFormation stacks roles.
-      Policies:
-        - PolicyName: inline-policy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - iam:CreateRole
-                  - iam:UpdateRole
-                  - iam:DeleteRole
-                  - iam:TagRole
-                  - iam:UntagRole
-                  - iam:PutRolePolicy
-                  - iam:DeleteRolePolicy
-                  - iam:AttachRolePolicy
-                  - iam:DetachRolePolicy
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - cloudformation:Get*
-                  - cloudformation:List*
-                  - cloudformation:Describe*
-                  - cloudformation:CreateStack
-                  - cloudformation:DeleteStack
-                  - cloudformation:CreateChangeSet
-                  - cloudformation:UpdateStack
-                  - cloudformation:CreateTag
-                  - cloudformation:DeleteTag
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                Resource:
-                  - !Sub arn:aws:s3:::attini-artifact-store-${AWS::Region}-${AWS::AccountId}/${AttiniEnvironmentName}/${AttiniDistributionName}/*

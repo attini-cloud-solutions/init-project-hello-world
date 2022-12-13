@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  AttiniEnvironmentName:
+    Type: String
+
+Resources:
+
+  HelloWorldLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub Lambda that returns hello ${AttiniEnvironmentName} world
+      FunctionName: !Sub ${AttiniEnvironmentName}-hello-world-get-parameter
+      InlineCode: |
+          import json
+          import boto3
+          import os
+
+          def lambda_handler(event, context):
+
+            return f"Hello {os.environ['Env']} world"
+
+      Environment:
+        Variables:
+          Env: !Ref AttiniEnvironmentName
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      FunctionUrlConfig:
+        AuthType: NONE
+
+
+  HelloWorldLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${HelloWorldLambda}
+      RetentionInDays: 30
+
+
+Outputs:
+  FunctionUrl:
+    Value: !GetAtt HelloWorldLambdaUrl.FunctionUrl
+  FunctionName:
+    Value: !Ref HelloWorldLambda

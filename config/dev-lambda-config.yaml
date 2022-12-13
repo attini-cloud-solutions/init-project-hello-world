@@ -1,6 +1,0 @@
-# https://docs.attini.io/api-reference/cloudformation-configuration.html
-extends: # This will "merge" the config with /config/core-lambda-config.yaml. If any key is duplicated, the value in this file will take priority.
-  /config/default-lambda-config.yaml
-parameters:
-  Timeout: 600
-  MemorySize: 512

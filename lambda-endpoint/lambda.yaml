@@ -38,7 +38,7 @@ Resources:
 
 
 Outputs:
-  FunctionUrl:
-    Value: !GetAtt HelloWorldLambdaUrl.FunctionUrl
   FunctionName:
     Value: !Ref HelloWorldLambda
+  Url:
+    Value: !GetAtt HelloWorldLambdaUrl.FunctionUrl

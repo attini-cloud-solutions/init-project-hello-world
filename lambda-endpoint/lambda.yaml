@@ -13,8 +13,6 @@ Resources:
       Description: !Sub Lambda that returns hello ${AttiniEnvironmentName} world
       FunctionName: !Sub ${AttiniEnvironmentName}-hello-world-get-parameter
       InlineCode: |
-          import json
-          import boto3
           import os
 
           def lambda_handler(event, context):

@@ -13,14 +13,14 @@ Resources:
     Type: Attini::Deploy::DeploymentPlan # https://docs.attini.io/api-reference/deployment-plan.html
     Properties:
       DeploymentPlan:
-        - Name: HelloWorldLambda
+        - Name: Deploy_HelloWorldLambda
           Type: AttiniCfn
           Properties:
             StackName: !Sub ${AttiniEnvironmentName}-hello-world-lambda
-            Template: /endpoint-lambda/lambda.yaml
-        - Name: InvokeTheLambda
+            Template: /lambda-endpoint/lambda.yaml
+        - Name: Invoke_HelloWorldLambda
           Type: AttiniLambdaInvoke
           Parameters:
-            FunctionName.$: $.output.HelloWorldLambda.FunctionName
+            FunctionName.$: $.output.Deploy_HelloWorldLambda.FunctionName
 
 
